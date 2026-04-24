@@ -203,6 +203,66 @@ public function boot(): void
 }
 ```
 
+### Adding calendar events via `systemcalendars.register`
+
+Use the `SYSTEM_CALENDARS_REGISTER` filter to contribute a calendar that appears
+in the ChurchCRM sidebar alongside Birthdays and Anniversaries. Your class must
+implement `ChurchCRM\SystemCalendars\SystemCalendar`:
+
+```php
+use ChurchCRM\Plugin\Hook\HookManager;
+use ChurchCRM\Plugin\Hooks;
+use ChurchCRM\SystemCalendars\SystemCalendar;
+use ChurchCRM\model\ChurchCRM\Event;
+use Propel\Runtime\Collection\ObjectCollection;
+
+// In your plugin class:
+public function boot(): void
+{
+    HookManager::addFilter(Hooks::SYSTEM_CALENDARS_REGISTER, [$this, 'registerCalendars']);
+}
+
+public function registerCalendars(array $calendars): array
+{
+    $calendars[] = new MyPluginCalendar($this);
+    return $calendars;
+}
+
+// Separate class implementing the interface:
+class MyPluginCalendar implements SystemCalendar
+{
+    public function getId(): int          { return 9001; }  // pick a stable unique int
+    public function getName(): string     { return 'My Plugin Events'; }
+    public function getAccessToken(): bool { return true; } // true = visible to all users
+    public function getForegroundColor(): string { return '#ffffff'; }
+    public function getBackgroundColor(): string { return '#3b82f6'; }
+    public static function isAvailable(): bool   { return true; }
+
+    public function getEvents(string $start, string $end): ObjectCollection
+    {
+        // Return an ObjectCollection of Event objects for the date range.
+        // $start and $end are ISO-8601 strings (e.g. "2026-01-01T00:00:00").
+        $collection = new ObjectCollection();
+        // … build Event objects and append to $collection …
+        return $collection;
+    }
+
+    public function getEventById(int $id): ObjectCollection
+    {
+        // Return a single-item ObjectCollection for the given event id.
+        return new ObjectCollection();
+    }
+}
+```
+
+Declare the capability in `approved-plugins.json` when submitting:
+```json
+"permissions": ["calendar.register"]
+```
+
+See [`src/plugins/core/holidays/`](https://github.com/ChurchCRM/CRM/tree/master/src/plugins/core/holidays)
+for a full working implementation.
+
 ---
 
 ## Adding features: routes, views & settings
