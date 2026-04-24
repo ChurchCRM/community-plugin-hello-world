@@ -2,7 +2,7 @@
     "id": "hello-world",
     "name": "Hello World",
     "description": "Minimal community plugin example: a menu entry, a hook listener, a settings field, and plugin-local translations.",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "author": "ChurchCRM Community",
     "authorUrl": "https://github.com/ChurchCRM/community-plugin-hello-world",
     "type": "community",

@@ -55,13 +55,12 @@ trap 'rm -rf "$STAGING"' EXIT
 PLUGIN_STAGING="$STAGING/$PLUGIN_ID"
 mkdir "$PLUGIN_STAGING"
 
-# Copy everything except development-only artifacts
-rsync -a --exclude='.git' \
+# Copy everything except development-only artifacts and hidden files.
+# The CRM installer rejects hidden files (dotfiles) other than .editorconfig
+# and .gitattributes, so exclude all of them to avoid install errors.
+rsync -a --exclude='.*' \
          --exclude='dist' \
          --exclude='scripts' \
-         --exclude='*.sh' \
-         --exclude='.DS_Store' \
-         --exclude='.idea' \
          --exclude='node_modules' \
          "$REPO_ROOT/" "$PLUGIN_STAGING/"
 
